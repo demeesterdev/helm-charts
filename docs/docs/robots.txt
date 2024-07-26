@@ -1,0 +1,4 @@
+User-Agent: *
+Allow: /
+
+Sitemap: https://charts.demeesterdev.dev/sitemap.xml
