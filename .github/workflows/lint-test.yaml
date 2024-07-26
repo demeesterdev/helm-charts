@@ -14,9 +14,9 @@ jobs:
       matrix:
         # Supported versions at https://kubernetes.io/releases/
         version:
-          - v1.28.6 # EOL 2024-10-28
           - v1.29.1 # EOL 2025-02-28
-          - v1.30.3 # EOL 2025-06-28
+          - v1.30.2 # EOL 2025-06-28
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
