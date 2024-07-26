@@ -1,0 +1,66 @@
+name: Lint and Test Charts for k8s
+
+on: pull_request
+
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # Supported versions at https://kubernetes.io/releases/
+        version:
+          - v1.29.1 # EOL 2025-02-28
+          - v1.30.2 # EOL 2025-06-28
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        with:
+          install_only: true
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config ct.yaml)
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run chart-testing (lint)
+        run: ct lint --config ct.yaml --check-version-increment=false
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.10.0
+        with:
+          node_image: kindest/node:${{ matrix.version }}
+        if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Run chart-testing (install)
+        run: ct install --config ct.yaml --helm-extra-set-args='--set=server.resources=null'
+
+  lint-results:
+    if: always()
+    needs: [lint-test]
+    runs-on: ubuntu-22.04
+    steps:
+      - run: |
+          result="${{ needs.lint-test.result }}"
+          if [[ "$result" == "success" || "$result" == "skipped" ]]; then
+            echo "All charts passed linting and tests"
+          else
+            echo "One or more charts failed linting or tests" >&2
+            exit 1
+          fi

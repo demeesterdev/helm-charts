@@ -1,0 +1,187 @@
+# Default values for app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# hostname: staticname
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "alpine"
+
+command: []
+args: []
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccountName:
+
+secrets: []
+# - name: app-creds
+#   data:
+#     API_KEY: 'asdfgh123456'
+#     SMTP_PASSWORD: '123456asdfgh'
+# - name: app-secret-key
+#   data:
+#     SECRET_KEY: ashdfsfa
+# - name: app-keyfile
+#   data:
+#     keyfile.txt: |
+#       using
+#       multiline
+#       strings
+
+configs: []
+# - name: app-config
+#   data:
+#     TEST_ENV: alive
+# - name: app-otherenv
+#   data:
+#     SPECIAL_KEY: here
+# - name: app-configfile
+#   data:
+#     test.ini: |
+#       [test]
+#       value=1
+
+envFrom: []
+# - secretRef:
+#     name: app-creds
+# - configMapRef:
+#     name: app-config
+
+env: []
+# - name: APP_DEBUG
+#   value: "true"
+# - name: SPECIAL_KEY
+#   valueFrom:
+#     configMapKeyRef:
+#       name: app-otherenv
+#       key: SPECIAL_KEY
+# - name: SECRET_KEY
+#   valueFrom:
+#     secretKeyRef:
+#       name: app-secret-key
+#       key: SECRET_KEY
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+deploymentStrategy:
+  type: Recreate
+
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+  # annotations:
+  #   metallb.universe.tf/loadBalancerIPs: 192.168.1.234
+  # externalTrafficPolicy: Cluster
+  # sessionAffinity: ClientIP
+  # sessionAffinityConfig:
+  #  clientIP:
+  #    timeoutSeconds: 120
+
+persistentVolumes: []
+# - name: data
+#   mountPath: /data
+#   subPath: test
+#   size: 5Gi
+#   persistentVolumeClaim:
+#     name: app-data
+#     storageClass: mayastor-nvmf
+# - name: config
+#   mountPath: /config
+#   configMap:
+#     name: app-configfile
+#     items:
+#     - key: test.ini
+#       path: config.ini
+# - name: keys
+#   mountPath: /keys
+#   readOnly: true
+#   secret:
+#     secretName: app-keyfile
+# - name: nfs
+#   mountPath: /data
+#   nfs:
+#     server: your.server.ip
+#     path: /path/to/dir
+
+extraVolumes: []
+
+ingress:
+  enabled: true
+  annotations:
+    {}
+    # cert-manager.io/cluster-issuer: letsencrypt
+  # ingressClassName: traefik
+  # ingressClassName: internal
+  hosts:
+    - host: example.demeester.app
+      paths:
+        - port: 80
+          path: /
+          pathType: Prefix
+  tls:
+    - secretName: example-demeester-app-tls
+      hosts:
+        - example.mcswain.app
+
+probes:
+  {}
+  # liveness:
+  #   httpGet:
+  #     path: /
+  #     port: http
+  # readiness:
+  #   httpGet:
+  #     path: /
+  #     port: http
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+lifecycle:
+  {}
+  # postStart:
+  #   exec:
+  #     command:
+  #       - /bin/sh
+  #       - -c
+  #       - cp /tmp/file /var/app/file
+
+initContainers: []
+extraContainers: []
