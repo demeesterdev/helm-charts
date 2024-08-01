@@ -1,6 +1,7 @@
 # Kubernetes Helm Charts
 
-> Inspired by [helm-charts | USA-RedDragon](https://github.com/USA-RedDragon/helm-charts)
+> Inspired by
+> [https://charts.mcswain.dev/](https://charts.mcswain.dev/)
 
 The code is provided as is without warrenties to others or myself.
 
@@ -18,3 +19,7 @@ helm repo add demeesterdev https://charts.demeester.dev
 You can then run `helm search repo demeesterdev` to see the charts.
 
 ## Chart Overview
+
+| Chart | Description |
+| ----- | ----------- |
+| [container-app](charts/container-app/) | A Helm chart for a generic Docker app |
