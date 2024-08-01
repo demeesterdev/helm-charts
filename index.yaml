@@ -15,4 +15,19 @@ entries:
     urls:
     - https://github.com/demeesterdev/helm-charts/releases/download/app-0.1.1/app-0.1.1.tgz
     version: 0.1.1
-generated: "2024-07-26T15:43:49.471020469Z"
+  container-app:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-01T12:17:19.947755936Z"
+    description: A Helm chart for a generic Docker app
+    digest: 80b69e4201ee17cf7d968bcfc6635d8d33fc5261e666b4abcb48ba0ac5b155eb
+    maintainers:
+    - email: thijs@demeester.dev
+      name: demeesterdev
+      url: https://github.com/demeesterdev
+    name: container-app
+    type: application
+    urls:
+    - https://github.com/demeesterdev/helm-charts/releases/download/container-app-0.1.2/container-app-0.1.2.tgz
+    version: 0.1.2
+generated: "2024-08-01T12:17:19.947762158Z"
