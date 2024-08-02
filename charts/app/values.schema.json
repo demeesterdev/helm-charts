@@ -1,0 +1,365 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "affinity": {
+      "additionalProperties": false,
+      "title": "affinity",
+      "type": "object"
+    },
+    "args": {
+      "items": {},
+      "title": "args",
+      "type": "array"
+    },
+    "command": {
+      "items": {},
+      "title": "command",
+      "type": "array"
+    },
+    "configs": {
+      "items": {},
+      "title": "configs",
+      "type": "array"
+    },
+    "deploymentStrategy": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "default": "Recreate",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "title": "deploymentStrategy",
+      "type": "object",
+      "required": [
+        "type"
+      ]
+    },
+    "env": {
+      "items": {},
+      "title": "env",
+      "type": "array"
+    },
+    "envFrom": {
+      "items": {},
+      "title": "envFrom",
+      "type": "array"
+    },
+    "extraContainers": {
+      "items": {},
+      "title": "extraContainers",
+      "type": "array"
+    },
+    "extraVolumes": {
+      "items": {},
+      "title": "extraVolumes",
+      "type": "array"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "nginx",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "alpine",
+          "description": "## Overrides the image tag whose default is the chart appVersion.",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "description": "hostname: staticname",
+      "title": "image",
+      "type": "object",
+      "required": [
+        "repository",
+        "pullPolicy",
+        "tag"
+      ]
+    },
+    "imagePullSecrets": {
+      "items": {},
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "additionalProperties": false,
+          "title": "annotations",
+          "type": "object"
+        },
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "hosts": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "host": {
+                    "default": "example.demeester.app",
+                    "title": "host",
+                    "type": "string"
+                  },
+                  "paths": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "path": {
+                              "default": "/",
+                              "title": "path",
+                              "type": "string"
+                            },
+                            "pathType": {
+                              "default": "Prefix",
+                              "title": "pathType",
+                              "type": "string"
+                            },
+                            "port": {
+                              "default": 80,
+                              "title": "port",
+                              "type": "integer"
+                            }
+                          },
+                          "type": "object",
+                          "required": [
+                            "port",
+                            "path",
+                            "pathType"
+                          ]
+                        }
+                      ]
+                    },
+                    "title": "paths",
+                    "type": "array"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "host",
+                  "paths"
+                ]
+              }
+            ]
+          },
+          "description": "cert-manager.io/cluster-issuer: letsencrypt\ningressClassName: traefik\ningressClassName: internal",
+          "title": "hosts",
+          "type": "array"
+        },
+        "tls": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "hosts": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "title": "hosts",
+                    "type": "array"
+                  },
+                  "secretName": {
+                    "default": "example-demeester-app-tls",
+                    "title": "secretName",
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "secretName",
+                  "hosts"
+                ]
+              }
+            ]
+          },
+          "title": "tls",
+          "type": "array"
+        }
+      },
+      "title": "ingress",
+      "type": "object",
+      "required": [
+        "enabled",
+        "annotations",
+        "hosts",
+        "tls"
+      ]
+    },
+    "initContainers": {
+      "items": {},
+      "title": "initContainers",
+      "type": "array"
+    },
+    "lifecycle": {
+      "additionalProperties": false,
+      "title": "lifecycle",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "additionalProperties": false,
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "persistentVolumes": {
+      "items": {},
+      "title": "persistentVolumes",
+      "type": "array"
+    },
+    "podAnnotations": {
+      "additionalProperties": false,
+      "title": "podAnnotations",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "additionalProperties": false,
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "probes": {
+      "additionalProperties": false,
+      "title": "probes",
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": 1,
+      "title": "replicaCount",
+      "type": "integer"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "title": "resources",
+      "type": "object"
+    },
+    "secrets": {
+      "items": {},
+      "title": "secrets",
+      "type": "array"
+    },
+    "securityContext": {
+      "additionalProperties": false,
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "additionalProperties": false,
+      "properties": {
+        "ports": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "default": "http",
+                    "title": "name",
+                    "type": "string"
+                  },
+                  "port": {
+                    "default": 80,
+                    "title": "port",
+                    "type": "integer"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "name",
+                  "port"
+                ]
+              }
+            ]
+          },
+          "title": "ports",
+          "type": "array"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "title": "service",
+      "type": "object",
+      "required": [
+        "type",
+        "ports"
+      ]
+    },
+    "serviceAccountName": {
+      "default": "",
+      "title": "serviceAccountName",
+      "type": "string"
+    },
+    "tolerations": {
+      "items": {},
+      "title": "tolerations",
+      "type": "array"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "replicaCount",
+    "image",
+    "command",
+    "args",
+    "imagePullSecrets",
+    "nameOverride",
+    "fullnameOverride",
+    "serviceAccountName",
+    "secrets",
+    "configs",
+    "envFrom",
+    "env",
+    "podAnnotations",
+    "podSecurityContext",
+    "securityContext",
+    "deploymentStrategy",
+    "service",
+    "persistentVolumes",
+    "extraVolumes",
+    "ingress",
+    "probes",
+    "resources",
+    "nodeSelector",
+    "tolerations",
+    "affinity",
+    "lifecycle",
+    "initContainers",
+    "extraContainers"
+  ]
+}

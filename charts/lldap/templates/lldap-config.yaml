@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "chart.fullname" . }}-config
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+    {{- include "chart.selectorLabels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  {{- if eq .Values.logLevel "verbose" }}
+  LLDAP_VERBOSE: "true"
+  {{- end }}
+  LLDAP_HTTP_HOST: "0.0.0.0"
+  LLDAP_HTTP_PORT: "17170"
+  LLDAP_HTTP_URL: {{ .Values.endpoints.http.url | required "endpoints.http.url must be set" | quote }}
+  LLDAP_LDAP_HOST: "0.0.0.0"
+  LLDAP_LDAP_PORT: "3890"
+  LLDAP_LDAPS_OPTIONS__ENABLED: {{ .Values.endpoints.ldaps.enabled | quote }}
+  {{- if .Values.endpoints.ldaps.enabled}}
+  LLDAP_LDAPS_OPTIONS__PORT: 6360
+  LLDAP_LDAPS_OPTIONS__CERT_FILE: "/var/ldaps-cerificate/cert.pem"
+  LLDAP_LDAPS_OPTIONS__KEY_FILE: "/var/ldaps-cerificate/key.pem"
+  {{- end }}

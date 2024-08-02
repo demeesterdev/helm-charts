@@ -1,0 +1,52 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-web
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.endpoints.http.service.type }}
+  ports:
+    - port: {{ .Values.endpoints.http.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "chart.selectorLabels" . | nindent 4 }}
+{{- if .Values.endpoints.ldap.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-ldap
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.endpoints.ldap.service.type }}
+  ports:
+    - port: {{ .Values.endpoints.ldap.service.port }}
+      targetPort: ldap
+      protocol: TCP
+      name: ldap
+  selector:
+    {{- include "chart.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- if .Values.endpoints.ldaps.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-ldaps
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.endpoints.ldaps.service.type }}
+  ports:
+    - port: {{ .Values.endpoints.ldaps.service.port }}
+      targetPort: ldaps
+      protocol: TCP
+      name: ldaps
+  selector:
+    {{- include "chart.selectorLabels" . | nindent 4 }}
+{{- end }}

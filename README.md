@@ -22,4 +22,5 @@ You can then run `helm search repo demeesterdev` to see the charts.
 
 | Chart | Description |
 | ----- | ----------- |
-| [container-app](charts/container-app/) | A Helm chart for a generic Docker app |
+| [app](charts/app/)     | A Helm chart for a generic Docker app |
+| [lldap](charts/lldap/) | "lldap is a Light LDAP implementation for authentication |
