@@ -1,0 +1,732 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "affinity": {
+      "additionalProperties": false,
+      "title": "affinity",
+      "type": "object"
+    },
+    "autoscaling": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "maxReplicas": {
+          "default": 100,
+          "title": "maxReplicas",
+          "type": "integer"
+        },
+        "minReplicas": {
+          "default": 1,
+          "title": "minReplicas",
+          "type": "integer"
+        },
+        "targetCPUUtilizationPercentage": {
+          "default": 80,
+          "title": "targetCPUUtilizationPercentage",
+          "type": "integer"
+        }
+      },
+      "title": "autoscaling",
+      "type": "object"
+    },
+    "externalMariadb": {
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "additionalProperties": false,
+          "properties": {
+            "database": {
+              "default": "lldap",
+              "title": "database",
+              "type": "string"
+            },
+            "host": {
+              "default": "",
+              "title": "host",
+              "type": "string"
+            },
+            "password": {
+              "default": "",
+              "title": "password",
+              "type": "string"
+            },
+            "port": {
+              "default": 3306,
+              "title": "port",
+              "type": "integer"
+            },
+            "username": {
+              "default": "",
+              "title": "username",
+              "type": "string"
+            }
+          },
+          "title": "auth",
+          "type": "object"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        }
+      },
+      "description": "Enable and configure external mariadb database",
+      "title": "externalMariadb",
+      "type": "object"
+    },
+    "externalPostgresql": {
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "additionalProperties": false,
+          "properties": {
+            "database": {
+              "default": "lldap",
+              "title": "database",
+              "type": "string"
+            },
+            "host": {
+              "default": "",
+              "title": "host",
+              "type": "string"
+            },
+            "password": {
+              "default": "",
+              "title": "password",
+              "type": "string"
+            },
+            "port": {
+              "default": 5432,
+              "title": "port",
+              "type": "integer"
+            },
+            "username": {
+              "default": "",
+              "title": "username",
+              "type": "string"
+            }
+          },
+          "title": "auth",
+          "type": "object"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        }
+      },
+      "description": "- Enable and configure external postgresql database",
+      "title": "externalPostgresql",
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "description": "image pull policy",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "lldap/lldap",
+          "description": "image repository",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "",
+          "description": "image tag\n@default -- chart.appVersion",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "items": {},
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "title": "annotations"
+        },
+        "className": {
+          "default": "",
+          "title": "className",
+          "type": "string"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "hosts": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "host": {
+                    "default": "chart-example.local",
+                    "title": "host",
+                    "type": "string"
+                  },
+                  "paths": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "path": {
+                              "default": "/",
+                              "title": "path",
+                              "type": "string"
+                            },
+                            "pathType": {
+                              "default": "ImplementationSpecific",
+                              "title": "pathType",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "title": "paths",
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            ]
+          },
+          "description": "kubernetes.io/ingress.class: nginx\nkubernetes.io/tls-acme: \"true\"",
+          "title": "hosts",
+          "type": "array"
+        },
+        "tls": {
+          "items": {},
+          "title": "tls",
+          "type": "array"
+        }
+      },
+      "description": "Enable and configure ingress settings for the chart under this key.\n@default -- See values.yaml",
+      "title": "ingress",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "additionalProperties": false,
+      "properties": {
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "default": "/",
+              "title": "path",
+              "type": "string"
+            },
+            "port": {
+              "default": "http",
+              "title": "port",
+              "type": "string"
+            }
+          },
+          "title": "httpGet",
+          "type": "object"
+        }
+      },
+      "title": "livenessProbe",
+      "type": "object"
+    },
+    "lldap": {
+      "additionalProperties": false,
+      "properties": {
+        "extraVolumeMounts": {
+          "items": {},
+          "title": "extraVolumeMounts",
+          "type": "array"
+        },
+        "extraVolumes": {
+          "items": {},
+          "description": "- define extra volumes and mounts for the ldap",
+          "title": "extraVolumes",
+          "type": "array"
+        },
+        "gid": {
+          "default": 1001,
+          "title": "gid",
+          "type": "integer"
+        },
+        "jwtSecret": {
+          "default": "~",
+          "description": "Random secret for JWT signature.\nThis secret should be random, and should be shared with application servers that need to\nconsume the JWTs. Changing this secret will invalidate all user sessions and require them\nto re-login.\n@default -- generates a 64 long alphanumeric string",
+          "title": "jwtSecret",
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "keySeed": {
+          "default": "~",
+          "description": "Seed to generate the server private key. This can be any random string, the recommendation\nis that it's at least 12 characters long.\n@default -- generates a 64 long alphanumeric string",
+          "title": "keySeed",
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "ldapBaseDomain": {
+          "default": "dc=example,dc=com",
+          "pattern": "^(dc=([a-z0-9]([-a-z0-9]*[a-z0-9])?))(,dc=([a-z0-9]([-a-z0-9]*[a-z0-9])?))*$",
+          "description": "Base DN for LDAP.\nThis is usually your domain name, and is used as a\nnamespace for your users. The choice is arbitrary, but will be needed\nto configure the LDAP integration with other services.\nThe sample value is for \"example.com\", but you can extend it with as\nmany \"dc\" as you want, and you don't actually need to own the domain\nname.",
+          "title": "ldapBaseDomain"
+        },
+        "ldapUser": {
+          "additionalProperties": false,
+          "properties": {
+            "email": {
+              "default": "~",
+              "format": "idn-email",
+              "description": "The email of the admin user.",
+              "title": "email"
+            },
+            "existingSecret": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "default": "~",
+                  "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)$",
+                  "description": "Existing secret containing the admin credentials\nIf set, the admin user will be created using the values in the secret\nexpects the keys \"username\", \"password\"",
+                  "title": "name"
+                }
+              },
+              "title": "existingSecret",
+              "type": "object"
+            },
+            "ldapAdminForceReset": {
+              "default": false,
+              "description": "Force reset of the admin password.\nBreak glass in case of emergency: if you lost the admin password, you\ncan set this to true to force a reset of the admin password to the value\nof ldap_user_pass above.",
+              "title": "ldapAdminForceReset",
+              "type": "boolean"
+            },
+            "secretName": {
+              "default": "~",
+              "description": "The secret to store the admin credentials in\nexistingSecret will overrule this value\n@default -- \u003crelease-name\u003e-user",
+              "title": "secretName",
+              "type": "null"
+            },
+            "username": {
+              "default": "admin",
+              "description": "The username of the admin user.\na value of \"admin\" here will create the LDAP user\n\"cn=admin,ou=people,dc=example,dc=com\" (with ldapBaseDomain above).\nFor the administration interface, this is the username.",
+              "title": "username",
+              "type": "string"
+            }
+          },
+          "description": "LDAP admin user.\nFor the LDAP interface.",
+          "title": "ldapUser",
+          "type": "object"
+        },
+        "ldaps": {
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "default": false,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "secret": {
+              "additionalProperties": false,
+              "properties": {
+                "certKey": {
+                  "default": "tls.crt",
+                  "description": "The key in the secret containing the certificate",
+                  "title": "certKey",
+                  "type": "string"
+                },
+                "keyKey": {
+                  "default": "tls.key",
+                  "description": "The key in the secret containing the key",
+                  "title": "keyKey",
+                  "type": "string"
+                },
+                "name": {
+                  "default": "~",
+                  "description": "The secret containing the certificate and key for the ldaps service",
+                  "title": "name",
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                }
+              },
+              "title": "secret",
+              "type": "object"
+            }
+          },
+          "description": "Options to configure LDAPS\n@default -- see below",
+          "title": "ldaps",
+          "type": "object"
+        },
+        "smtp": {
+          "additionalProperties": false,
+          "properties": {
+            "enablePasswordReset": {
+              "default": false,
+              "description": "Whether to enabled password reset via email, from LLDAP.",
+              "title": "enablePasswordReset",
+              "type": "boolean"
+            },
+            "encryption": {
+              "default": "TLS",
+              "description": "SMTP encryption type.\nvalid values are \"NONE\" (no encryption), \"TLS\" or \"STARTTLS\"",
+              "title": "encryption",
+              "enum": [
+                "NONE",
+                "TLS",
+                "STARTTLS"
+              ]
+            },
+            "from": {
+              "additionalProperties": false,
+              "properties": {
+                "email": {
+                  "default": "~",
+                  "format": "idn-email",
+                  "title": "email"
+                },
+                "name": {
+                  "default": "",
+                  "title": "name",
+                  "type": "string"
+                }
+              },
+              "description": "The header field, optional: how the sender appears in the email.",
+              "title": "from",
+              "type": "object"
+            },
+            "port": {
+              "default": "",
+              "description": "SMTP port.",
+              "title": "port",
+              "type": "string"
+            },
+            "replyTo": {
+              "additionalProperties": false,
+              "properties": {
+                "email": {
+                  "default": "~",
+                  "format": "idn-email",
+                  "title": "email"
+                },
+                "name": {
+                  "default": "",
+                  "title": "name",
+                  "type": "string"
+                }
+              },
+              "description": "The reply-to field, optional: where to send replies to. If not set, the\nfrom field is used (if set).",
+              "title": "replyTo",
+              "type": "object"
+            },
+            "server": {
+              "default": "",
+              "description": "SMTP server.",
+              "title": "server",
+              "type": "string"
+            },
+            "user": {
+              "additionalProperties": false,
+              "properties": {
+                "existingSecret": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "default": "~",
+                      "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)$",
+                      "description": "Existing secret containing the admin credentials\nIf set, the admin user will be created using the values in the secret\nexpects the keys \"username\", \"password\"",
+                      "title": "name",
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  },
+                  "title": "existingSecret",
+                  "type": "object"
+                },
+                "password": {
+                  "default": "",
+                  "description": "The password of the smtp user.",
+                  "title": "password",
+                  "type": "string"
+                },
+                "secretName": {
+                  "default": "",
+                  "description": "The secret to store the smtp credentials in\nexistingSecret will overrule this value\n@default -- \u003crelease-name\u003e-user",
+                  "title": "secretName",
+                  "type": "string"
+                },
+                "username": {
+                  "default": "",
+                  "description": "The SMPT user, usually your email address.",
+                  "title": "username",
+                  "type": "string"
+                }
+              },
+              "description": "SMTP user.",
+              "title": "user",
+              "type": "object"
+            }
+          },
+          "description": "Options to configure SMTP parameters ti sebd oasswird reset emails\n@default -- see below",
+          "title": "smtp",
+          "type": "object"
+        },
+        "tz": {
+          "default": "Etc/UTC",
+          "title": "tz",
+          "type": "string"
+        },
+        "uid": {
+          "default": 1001,
+          "title": "uid",
+          "type": "integer"
+        },
+        "verbose": {
+          "default": false,
+          "description": "Tune the logging to be more verbose",
+          "title": "verbose",
+          "type": "boolean"
+        }
+      },
+      "title": "lldap",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "additionalProperties": false,
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "persistence": {
+      "additionalProperties": false,
+      "properties": {
+        "accessMode": {
+          "default": "ReadWriteOnce",
+          "description": "storageClassName: default",
+          "title": "accessMode",
+          "type": "string"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "finalizers": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "description": "annotations: {}",
+          "title": "finalizers",
+          "type": "array"
+        },
+        "lookupVolumeName": {
+          "default": true,
+          "description": "If 'lookupVolumeName' is set to true, Helm will attempt to retrieve\nthe current value of 'spec.volumeName' and incorporate it into the template.",
+          "title": "lookupVolumeName",
+          "type": "boolean"
+        },
+        "size": {
+          "default": "100Mi",
+          "title": "size",
+          "type": "string"
+        },
+        "type": {
+          "default": "pvc",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "description": "Persistence is only required if you are using the SQLite database (default).\nYou can disable persistence if you select MariaDB or PostgreSQL.\n@default -- see values.yaml",
+      "title": "persistence",
+      "type": "object"
+    },
+    "podAnnotations": {
+      "additionalProperties": true,
+      "title": "podAnnotations"
+    },
+    "podLabels": {
+      "additionalProperties": true,
+      "title": "podLabels"
+    },
+    "podSecurityContext": {
+      "additionalProperties": true,
+      "title": "podSecurityContext"
+    },
+    "readinessProbe": {
+      "additionalProperties": false,
+      "properties": {
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "default": "/",
+              "title": "path",
+              "type": "string"
+            },
+            "port": {
+              "default": "http",
+              "title": "port",
+              "type": "string"
+            }
+          },
+          "title": "httpGet",
+          "type": "object"
+        }
+      },
+      "title": "readinessProbe",
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": 1,
+      "description": "Number of lldap replicas.\nDo not increase this above 1 if you are using the SQLite backend.",
+      "title": "replicaCount",
+      "type": "integer"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "title": "resources",
+      "type": "object"
+    },
+    "securityContext": {
+      "additionalProperties": true,
+      "default": "",
+      "title": "securityContext"
+    },
+    "service": {
+      "additionalProperties": false,
+      "properties": {
+        "http": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {
+              "default": 17170,
+              "title": "port",
+              "type": "integer"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "title": "http",
+          "type": "object"
+        },
+        "ldap": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {
+              "default": 3890,
+              "title": "port",
+              "type": "integer"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "title": "ldap",
+          "type": "object"
+        },
+        "ldaps": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {
+              "default": 6360,
+              "title": "port",
+              "type": "integer"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "title": "ldaps",
+          "type": "object"
+        }
+      },
+      "description": "Configures service settings for the chart.\n@default -- See values.yaml",
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "additionalProperties": false,
+          "description": "Annotations to add to the service account",
+          "title": "annotations",
+          "type": "object"
+        },
+        "automount": {
+          "default": true,
+          "description": "Automatically mount a ServiceAccount's API credentials?",
+          "title": "automount",
+          "type": "boolean"
+        },
+        "create": {
+          "default": true,
+          "description": "Specifies whether a service account should be created",
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "description": "The name of the service account to use.\n@default -- If not set and create is true, a name is generated using the fullname template",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "tolerations": {
+      "items": {},
+      "title": "tolerations",
+      "type": "array"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object"
+}
