@@ -1,234 +1,279 @@
 # yaml-language-server: $schema=values.schema.json
-## Default values for chart.
-## This is a YAML-formatted file.
-## Declare variables to be passed into your templates.
+# Default values for lldap.
 
-## Note: paragraphs starting with `# --` will end up in our manual -
-## see https://github.com/norwoodj/helm-docs
+# -- Number of lldap replicas.
+# Do not increase this above 1 if you are using the SQLite backend.
 replicaCount: 1
+
 image:
+  # -- image repository
   repository: lldap/lldap
+  # -- image pull policy
   pullPolicy: IfNotPresent
-  ## Overrides the image tag whose default is the chart appVersion.
+  # -- image tag
+  # @default -- chart.appVersion
   tag: ""
+
 imagePullSecrets: []
-## -- Annotations to add to the deployment
-Annotations: {}
-## -- Labels to add to the deployment
-Labels: {}
+nameOverride: ""
+fullnameOverride: ""
 
-## @schema
-## enum:
-## - verbose
-## - info
-## @schema
-## -- What log level to output. Valid values are 'verbose' and 'info'
-logLevel: info
-## -- Additional arguments to pass in to the lldap instance
-additionalArgs: []
-## Any other environment variables:
-envVars: []
+lldap:
+  # @schema
+  # pattern: ^(dc=([a-z0-9]([-a-z0-9]*[a-z0-9])?))(,dc=([a-z0-9]([-a-z0-9]*[a-z0-9])?))*$
+  # @schema
+  # -- Base DN for LDAP.
+  # This is usually your domain name, and is used as a
+  # namespace for your users. The choice is arbitrary, but will be needed
+  # to configure the LDAP integration with other services.
+  # The sample value is for "example.com", but you can extend it with as
+  # many "dc" as you want, and you don't actually need to own the domain
+  # name.
+  ldapBaseDomain: "dc=example,dc=com"
 
-podSecurityContext:
-  {}
-  ## fsGroup: 2000
+  # -- LDAP admin user.
+  # For the LDAP interface.
+  ldapUser:
+    # -- The username of the admin user.
+    # a value of "admin" here will create the LDAP user
+    # "cn=admin,ou=people,dc=example,dc=com" (with ldapBaseDomain above).
+    # For the administration interface, this is the username.
+    username: "admin"
+    # @schema
+    # format: idn-email
+    # required: false
+    # @schema
+    # -- The email of the admin user.
+    email: ~
 
-securityContext:
-  {}
-  ## capabilities:
-  ##   drop:
-  ##   - ALL
-  ## readOnlyRootFilesystem: true
-  ## runAsNonRoot: true
-  ## runAsUser: 1000
-
-endpoints:
-  ## -- http service configuration for user login and admininstration
-  http:
-    ## -- The public URL of the server, for password reset links.
-    ## if using an ingress make shur it matches the ingress host and path
-    url: "http://localhost"
-    ## -- kubernetes service configuration
-    service:
-      type: ClusterIP
-      port: 80
-    ingress:
-      enabled: false
-      className: ""
-      annotations:
-        {}
-        ## kubernetes.io/ingress.class: traefik
-        ## kubernetes.io/tls-acme: "true"
-      hosts:
-        - host: chart-example.local
-          paths:
-            - path: /
-              pathType: ImplementationSpecific
-      tls: []
-      ##  - secretName: chart-example-tls
-      ##    hosts:
-      ##      - chart-example.local
-  ## -- ldap service configuration
-  ldap:
-    ## -- expose lldap unencrypted in the cluster
-    enabled: true
-    service:
-      type: ClusterIP
-      port: 389
-  ## -- expose lldap encrypted in the cluster
-  ldaps:
-    enabled: false
-    service:
-      type: ClusterIP
-      port: 636
-    secret:
-      ## -- The secret containing the certificate and key for the ldaps service
-      name: ""
-      ## -- The key in the secret containing the certificate
-      certKey: "tls.crt"
-      ## -- The key in the secret containing the key
-      keyKey: "tls.key"
-
-## @schema
-## pattern: ^(dc=([a-z0-9]([-a-z0-9]*[a-z0-9])?))(,dc=([a-z0-9]([-a-z0-9]*[a-z0-9])?))*$
-## @schema
-## -- Base DN for LDAP.
-## This is usually your domain name, and is used as a
-## namespace for your users. The choice is arbitrary, but will be needed
-## to configure the LDAP integration with other services.
-## The sample value is for "example.com", but you can extend it with as
-## many "dc" as you want, and you don't actually need to own the domain
-## name.
-ldapBaseDomain: "dc=example,dc=com"
-
-## -- LDAP admin user config
-## settings are used to iniitially create the admin user. user can change
-## the password after the first login. If no existing secret is provided.
-## a new password will be generated and stored in a new secret
-ldapAdmin:
-  userName: "admin"
-  email: ""
-
-  ## Force reset of the admin password.
-  ## Break glass in case of emergency: if you lost the admin password, you
-  ## can set this to true to force a reset of the admin password to the value
-  ## of ldap_user_pass above.
-  ldapAdminForceReset: false
-
-  ## -- set the password for the admin user
-  ## The secret to creat for the new admin user.
-  ## existingSecret will overrule this value
-  secretName: "lldap-admin-user"
-
-  ## -- use existing secret for admin user
-  ## If set, the admin user will be created using the values in the secret
-  ## expects the keys "username", "password" and "email"
-  existingSecret:
-    name: ""
-
-## -- Options to configure SMTP parameters, to send password reset emails
-passwordReset:
-  enabled: false
-  smtp:
-    ## -- SMTP server
-    server: ""
-    ## -- SMTP port
-    port: ""
-    ## @schema
-    ## enum:
-    ## - ""
-    ## - NONE
-    ## - TLS
-    ## - STARTTLS
-    ## @schema
-    ## -- SMTP encryption type.
-    ## valid values are "NONE" (no encryption), "TLS" or "STARTTLS"
-    encryption: ""
-    ## The header field, optional: how the sender appears in the email. The first
-    ## is a free-form name, followed by an email between <>
-    from: ""
-    ## -- The reply-to field, optional: where to send replies to. If not set, the
-    ## from field is used (if set).
-    replyTo: ""
-
-    ## @schema
-    ## required: false
-    ## @schema
-    ## -- SMTP user, usually your email address.
-    user: ""
-    ## @schema
-    ## required: false
-    ## @schema
-    ## -- SMTP password
-    password: ""
+    # -- The secret to store the admin credentials in
+    # existingSecret will overrule this value
+    # @default -- <release-name>-user
+    secretName: ~
 
     existingSecret:
-      ## @schema
-      ## required: false
-      ## @schema
-      ## -- Use and existing Secret contianing the SMTP credentials
-      ## expects the keys "user" and "password"
+      # @schema
+      # pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?)$
+      # required: false
+      # @schema
+      # -- Existing secret containing the admin credentials
+      # If set, the admin user will be created using the values in the secret
+      # expects the keys "username", "password"
+      name: ~
+
+    # Force reset of the admin password.
+    # Break glass in case of emergency: if you lost the admin password, you
+    # can set this to true to force a reset of the admin password to the value
+    # of ldap_user_pass above.
+    ldapAdminForceReset: false
+
+  # @schema
+  # type: [null, string]
+  # @schema
+  # -- Seed to generate the server private key. This can be any random string, the recommendation
+  # is that it's at least 12 characters long.
+  # @default -- generates a 64 long alphanumeric string
+  keySeed: ~
+
+  # @schema
+  # type: [null, string]
+  # @schema
+  # -- Random secret for JWT signature.
+  # This secret should be random, and should be shared with application servers that need to
+  # consume the JWTs. Changing this secret will invalidate all user sessions and require them
+  # to re-login.
+  # @default -- generates a 64 long alphanumeric string
+  jwtSecret: ~
+
+  uid: 1001
+  gid: 1001
+  tz: "Etc/UTC"
+
+  # -- Tune the logging to be more verbose
+  verbose: false
+
+  # -- Options to configure SMTP parameters ti sebd oasswird reset emails
+  # @default -- see below
+  smtp:
+    # -- Whether to enabled password reset via email, from LLDAP.
+    enablePasswordReset: false
+    # -- SMTP server.
+    server: ""
+    # -- SMTP port.
+    port: ""
+    # -- SMTP user.
+    user:
+      # -- The SMPT user, usually your email address.
+      username: ""
+      # -- The password of the smtp user.
+      password: ""
+
+      # -- The secret to store the smtp credentials in
+      # existingSecret will overrule this value
+      # @default -- <release-name>-user
+      secretName: ""
+
+      existingSecret:
+        # @schema
+        # pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?)$
+        # type: [null, string]
+        # @schema
+        # -- Existing secret containing the admin credentials
+        # If set, the admin user will be created using the values in the secret
+        # expects the keys "username", "password"
+        name: ~
+
+    # @schema
+    # enum:
+    # - NONE
+    # - TLS
+    # - STARTTLS
+    # @schema
+    # -- SMTP encryption type.
+    # valid values are "NONE" (no encryption), "TLS" or "STARTTLS"
+    encryption: "TLS"
+    # -- The header field, optional: how the sender appears in the email.
+    from:
       name: ""
+      # @schema
+      # format: idn-email
+      # required: false
+      # @schema
+      email: ~
 
-database:
-  ## -- The database to use. Valid values are "sqlite" and "postgres"
-  type: sqlite
-  ## -- The database connection string
-  ## for sqlite, this is the path to the database file
-  ## for postgres, this is the connection string
-  connection: "/data/users.db"
-  ## -- The key seed to generate the server private key.
-  ## used for password hashing
+    # -- The reply-to field, optional: where to send replies to. If not set, the
+    # from field is used (if set).
+    replyTo:
+      name: ""
+      # @schema
+      # format: idn-email
+      # required: false
+      # @schema
+      email: ~
 
-## Enable persistence using Persistent Volume Claims
-## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
-##
+  # -- Options to configure LDAPS
+  # @default -- see below
+  ldaps:
+    enabled: false
+    secret:
+      # @schema
+      # type: [null, string]
+      # @schema
+      # -- The secret containing the certificate and key for the ldaps service
+      name: ~
+      # -- The key in the secret containing the certificate
+      certKey: "tls.crt"
+      # -- The key in the secret containing the key
+      keyKey: "tls.key"
+  # --- define extra volumes and mounts for the ldap
+  extraVolumes: []
+  extraVolumeMounts: []
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # @default -- If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# @schema
+# additionalProperties: true
+# @schema
+podAnnotations: {}
+
+# @schema
+# additionalProperties: true
+# @schema
+podLabels: {}
+
+# @schema
+# additionalProperties: true
+# @schema
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+# @schema
+# additionalProperties: true
+# @schema
+securityContext:
+  # capabilities:
+  #  drop:
+  #    - ALL
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# -- Configures service settings for the chart.
+# @default -- See values.yaml
+service:
+  http:
+    type: ClusterIP
+    port: 17170
+  ldap:
+    type: ClusterIP
+    port: 3890
+  ldaps:
+    type: ClusterIP
+    port: 6360
+
+# -- Enable and configure ingress settings for the chart under this key.
+# @default -- See values.yaml
+ingress:
+  enabled: false
+  className: ""
+  # @schema
+  # additionalProperties: true
+  # @schema
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# -- Persistence is only required if you are using the SQLite database (default).
+# You can disable persistence if you select MariaDB or PostgreSQL.
+# @default -- see values.yaml
 persistence:
   type: pvc
   enabled: false
-  ## storageClassName: default
-  accessModes:
-    - ReadWriteOnce
+  # storageClassName: default
+  accessMode: ReadWriteOnce
   size: 100Mi
-  ## annotations: {}
+  # annotations: {}
   finalizers:
     - kubernetes.io/pvc-protection
-  ## selectorLabels: {}
-  ## Sub-directory of the PV to mount. Can be templated.
-  ## subPath: ""
-  ## Name of an existing PVC. Can be templated.
-  ## existingClaim:
-  ## Extra labels to apply to a PVC.
-  extraPvcLabels: {}
-  disableWarning: false
+  # If defined, storageClassName: <storageClass>
+  # If set to "-", storageClassName: "", which disables dynamic provisioning
+  # If undefined (the default) or set to null, no storageClassName spec is
+  #   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  #   GKE, AWS & OpenStack)
+  #
+  # storageClass: "-"
 
-  ## If persistence is not enabled, this allows to mount the
-  ## local storage in-memory to improve performance
-  ##
-  inMemory:
-    enabled: false
-    ## The maximum usage on memory medium EmptyDir would be
-    ## the minimum value between the SizeLimit specified
-    ## here and the sum of memory limits of all containers in a pod
-    ##
-    sizeLimit: 30Mi
-
-  ## If 'lookupVolumeName' is set to true, Helm will attempt to retrieve
-  ## the current value of 'spec.volumeName' and incorporate it into the template.
+  # If 'lookupVolumeName' is set to true, Helm will attempt to retrieve
+  # the current value of 'spec.volumeName' and incorporate it into the template.
   lookupVolumeName: true
 
 resources:
   {}
-  ## We usually recommend not to specify default resources and to leave this as a conscious
-  ## choice for the user. This also increases chances charts run on environments with little
-  ## resources, such as Minikube. If you do want to specify resources, uncomment the following
-  ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  ## limits:
-  ##   cpu: 100m
-  ##   memory: 128Mi
-  ## requests:
-  ##   cpu: 100m
-  ##   memory: 128Mi
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 livenessProbe:
   httpGet:
@@ -239,39 +284,35 @@ readinessProbe:
     path: /
     port: http
 
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  ## targetMemoryUtilizationPercentage: 80
-
-## Additional volumes on the output Deployment definition.
-volumes: []
-## - name: foo
-##   secret:
-##     secretName: mysecret
-##     optional: false
-
-## Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-## - name: foo
-##   mountPath: "/etc/foo"
-##   readOnly: true
-
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
 
-serviceAccount:
-  ## Specifies whether a service account should be created
-  create: true
-  ## Automatically mount a ServiceAccount's API credentials?
-  automount: true
-  ## Annotations to add to the service account
-  annotations: {}
-  ## The name of the service account to use.
-  ## If not set and create is true, a name is generated using the fullname template
-  name: ""
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# --- Enable and configure external postgresql database
+externalPostgresql:
+  enabled: false
+  auth:
+    host: ""
+    port: 5432
+    username: ""
+    password: ""
+    database: lldap
+
+# -- Enable and configure external mariadb database
+externalMariadb:
+  enabled: false
+  auth:
+    host: ""
+    port: 3306
+    username: ""
+    password: ""
+    database: lldap

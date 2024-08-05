@@ -1,52 +1,37 @@
----
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "chart.fullname" . }}-web
+  name: {{ include "lldap.fullname" . }}-http
   labels:
-    {{- include "chart.labels" . | nindent 4 }}
+    {{- include "lldap.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.endpoints.http.service.type }}
+  type: {{ .Values.service.http.type }}
   ports:
-    - port: {{ .Values.endpoints.http.service.port }}
+    - port: {{ .Values.service.http.port }}
       targetPort: http
       protocol: TCP
       name: http
   selector:
-    {{- include "chart.selectorLabels" . | nindent 4 }}
-{{- if .Values.endpoints.ldap.enabled }}
+    {{- include "lldap.selectorLabels" . | nindent 4 }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "chart.fullname" . }}-ldap
+  name: {{ include "lldap.fullname" . }}-ldap
   labels:
-    {{- include "chart.labels" . | nindent 4 }}
+    {{- include "lldap.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.endpoints.ldap.service.type }}
+  type: {{ .Values.service.ldap.type }}
   ports:
-    - port: {{ .Values.endpoints.ldap.service.port }}
+    - port: {{ .Values.service.ldap.port }}
       targetPort: ldap
       protocol: TCP
       name: ldap
-  selector:
-    {{- include "chart.selectorLabels" . | nindent 4 }}
-{{- end }}
-{{- if .Values.endpoints.ldaps.enabled }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ include "chart.fullname" . }}-ldaps
-  labels:
-    {{- include "chart.labels" . | nindent 4 }}
-spec:
-  type: {{ .Values.endpoints.ldaps.service.type }}
-  ports:
-    - port: {{ .Values.endpoints.ldaps.service.port }}
+    {{ if $.Values.lldap.ldaps.enabled }}
+    - port: {{ .Values.service.ldaps.port }}
       targetPort: ldaps
       protocol: TCP
       name: ldaps
+      {{ end }}
   selector:
-    {{- include "chart.selectorLabels" . | nindent 4 }}
-{{- end }}
+    {{- include "lldap.selectorLabels" . | nindent 4 }}

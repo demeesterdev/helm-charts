@@ -2,21 +2,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ include "lldap.fullname" . }}
   labels:
-    {{- include "chart.labels" . | nindent 4 }}
-    {{- include "chart.selectorLabels" . | nindent 4 }}
-  {{- with .Values.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- include "lldap.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
-      {{- include "chart.selectorLabels" . | nindent 6 }}
+      {{- include "lldap.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -24,7 +17,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "chart.labels" . | nindent 8 }}
+        {{- include "lldap.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -33,7 +26,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "lldap.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -43,38 +36,82 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-          {{- with .Values.additionalArgs }}
-            {{- range . }}
-            - {{ . | quote }}
-            {{- end }}
-          {{- end }}
-          envFrom:
-            - configMapRef:
-                name: {{ include "chart.fullname" . }}-config
-            - secretRef:
-                name: {{ include "chart.fullname" . }}-config
-            - secretRef:
-                name: {{ include "chart.fullname" . }}-smtp-config
           env:
-            - name: GID
-              value: "1001"
-            - name: UID
-              value: "1001"
+            - name: uid
+              value: "{{ .Values.lldap.uid }}"
+            - name: gid
+              value: "{{ .Values.lldap.gid }}"
+            - name: TZ
+              value: "{{ .Values.lldap.tz }}"
+            {{- if .Values.ingress.enabled }}
+            - name: LLDAP_HTTP_URL
+            {{- with (first .Values.ingress.hosts) }}
+              value: http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}{{- with (first .paths) }}{{ .path }}{{- end }}
+            {{- end }}
+            {{- end }}
+            - name: LLDAP_LDAP_PORT
+              value: "{{ .Values.service.ldap.port }}"
+            - name: LLDAP_HTTP_PORT
+              value: "{{ .Values.service.http.port }}"
             - name: LLDAP_LDAP_USER_DN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "chart.ldapUserSecretName" . }}
-                  key: {{ include "chart.ldapUserSecretkey.username" . }}
-            - name: LLDAP_LDAP_USER_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "chart.ldapUserSecretName" . }}
-                  key: {{ include "chart.ldapUserSecretkey.email" . }}
+                  name: {{ include "lldap.ldapUserSecretName" . }}
+                  key: 'username'
             - name: LLDAP_LDAP_USER_PASS
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "chart.ldapUserSecretName" . }}
-                  key: {{ include "chart.ldapUserSecretkey.password" . }}
+                  name: {{ include "lldap.ldapUserSecretName" . }}
+                  key: 'password'
+            {{- if .Values.lldap.ldapUser.email }}
+            - name: LLDAP_LDAP_USER_EMAIL
+              value: {{ .Values.lldap.ldapUser.email | quote }}
+            {{- end }}
+            - name: LLDAP_LDAP_BASE_DN
+              value: "{{ .Values.lldap.ldapBaseDomain }}"
+            - name: LLDAP_VERBOSE
+              value: "{{ .Values.lldap.verbose }}"
+            - name: LLDAP_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lldap.ldapConfigSecretName" . }}
+                  key: 'databaseUrl'
+            - name: LLDAP_KEY_SEED
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lldap.ldapConfigSecretName" . }}
+                  key: 'keySeed'
+            - name: LLDAP_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lldap.ldapConfigSecretName" . }}
+                  key: jwtSecret
+            - name: LLDAP_VERBOSE
+              value: "{{ .Values.lldap.verbose }}"
+            {{- if $.Values.lldap.smtp.enablePasswordReset }}
+            - name: LLDAP_SMTP_OPTIONS__ENABLE_PASSWORD_RESET
+              value: "{{ .Values.lldap.smtp.enablePasswordReset }}"
+            - name: LLDAP_SMTP_OPTIONS__SERVER
+              value: {{ .Values.lldap.smtp.server | quote }}
+            - name: LLDAP_SMTP_OPTIONS__PORT
+              value: {{ .Values.lldap.smtp.port | quote }}
+            - name: LLDAP_SMTP_OPTIONS__SMTP_ENCRYPTION
+              value: {{ .Values.lldap.smtp.encryption | quote }}
+            - name: LLDAP_SMTP_OPTIONS__FROM
+              value: {{ include "lldap.smtpFromString" . | quote }}
+            - name: LLDAP_SMTP_OPTIONS__REPLY_TO
+              value: {{ include "lldap.smtpReplyToString" . | quote }}
+            - name: LLDAP_SMTP_OPTIONS__USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lldap.smtpUserSecretName" . }}
+                  key: username
+            - name: LLDAP_SMTP_OPTIONS__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lldap.smtpUserSecretName" . }}
+                  key: password
+            {{- end }}
 
             {{- if .Values.envVars }}
             {{- with .Values.envVars }}
@@ -83,11 +120,16 @@ spec:
             {{- end }}
           ports:
             - name: http
-              containerPort: 17170
+              containerPort: {{ .Values.service.http.port }}
+              protocol: TCP
             - name: ldap
-              containerPort: 3890
+              containerPort: {{ .Values.service.ldap.port }}
+              protocol: TCP
+            {{ if $.Values.lldap.ldaps.enabled }}
             - name: ldaps
-              containerPort: 6360
+              containerPort: {{ .Values.service.ldaps.port }}
+              protocol: TCP
+            {{ end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -97,7 +139,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/data
-          {{- if eq .Values.endpoints.ldaps.enabled true }}
+          {{- if eq .Values.lldap.ldaps.enabled true }}
             - name: ldaps-certificate
               mountPath: /var/ldaps-certificate
           {{- end }}
@@ -105,35 +147,22 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
-      - name: data
-        emptyDir: {}
-      {{- if eq .Values.endpoints.ldaps.enabled true }}
+      {{- if eq .Values.lldap.ldaps.enabled true }}
       - name: ldaps-certificate
         secret:
-          secretName: {{ .Values.endpoints.ldaps.secret.name | required "service.ldaps.secretName must be set" | quote }}
+          secretName: {{ .Values.lldap.ldaps.secret.name | required "lldap.ldaps.secretName must be set" | quote }}
           items:
-            - key: {{ .Values.endpoints.ldaps.secret.certKey | required "service.ldaps.certKey must be set" | quote }}
+            - key: {{ .Values.lldap.ldaps.secret.certKey | required "lldap.ldaps.certKey must be set" | quote }}
               path: cert.pem
-            - key: {{ .Values.endpoints.ldaps.secret.keyKey | required "service.ldaps.keyKey must be set" | quote }}
+            - key: {{ .Values.lldap.ldaps.secret.keyKey | required "lldap.ldaps.keyKey must be set" | quote }}
               path: key.pem
       {{- end }}
+      - name: data
       {{- if and .Values.persistence.enabled (eq .Values.persistence.type "pvc") }}
-      - name: storage
         persistentVolumeClaim:
-          claimName: {{ tpl (.Values.persistence.existingClaim | default (include "chart.fullname" .)) . }}
-      {{- else if and .Values.persistence.enabled (has .Values.persistence.type $sts) }}
-      {{/* nothing */}}
+          claimName: {{ tpl (.Values.persistence.existingClaim | default (include "lldap.fullname" .)) . }}
       {{- else }}
-      - name: storage
-        {{- if .Values.persistence.inMemory.enabled }}
-        emptyDir:
-          medium: Memory
-          {{- with .Values.persistence.inMemory.sizeLimit }}
-          sizeLimit: {{ . }}
-          {{- end }}
-        {{- else }}
         emptyDir: {}
-        {{- end }}
       {{- end }}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}

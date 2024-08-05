@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "chart.name" -}}
+{{- define "lldap.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "chart.fullname" -}}
+{{- define "lldap.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "chart.chart" -}}
+{{- define "lldap.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "chart.labels" -}}
-helm.sh/chart: {{ include "chart.chart" . }}
-{{ include "chart.selectorLabels" . }}
+{{- define "lldap.labels" -}}
+helm.sh/chart: {{ include "lldap.chart" . }}
+{{ include "lldap.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "chart.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "chart.name" . }}
+{{- define "lldap.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "lldap.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "chart.serviceAccountName" -}}
+{{- define "lldap.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "chart.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "lldap.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -64,47 +64,58 @@ Create the name of the service account to use
 {{/*
 Build the connectionstring being used to connect to the backend
 */}}
-{{- define "chart.databaseURL" -}}
-{{- if eq .Values.database.type "sqlite" -}}
-sqlite:///
-{{- .Values.database.connection | trimPrefix "/" -}}
-?mode=rwc
-{{- else if eq .Values.database.type "postgres" -}}
-{{- .Values.database.connection }}
+{{- define "lldap.externalPostgresConnectString" -}}
+postgres://{{- .Values.externalPostgresql.auth.username -}}:{{- .Values.externalPostgresql.auth.password -}}@{{- .Values.externalPostgresql.auth.host -}}:{{- .Values.externalPostgresql.auth.port -}}/{{- .Values.externalPostgresql.auth.database -}}
+{{- end }}
+{{- define "lldap.externalMariadbConnectString" -}}
+mysql://{{- .Values.externalMariadb.auth.username -}}:{{- .Values.externalMariadb.auth.password -}}@{{- .Values.externalMariadb.auth.host -}}:{{- .Values.externalMariadb.auth.port -}}/{{- .Values.externalMariadb.auth.database -}}
+{{- end }}
+
+{{- define "lldap.databaseURL" -}}
+{{- if .Values.externalPostgresql.enabled -}}
+{{- include "lldap.postgresConnectString" . -}}
+{{- else if .Values.externalMariadb.enabled -}}
+{{- include "lldap.mariadbConnectString" . -}}
+{{- else -}}
+sqlite:///data/users.db?mode=rwc
 {{- end -}}
 {{- end }}
+
+
 
 {{/*
 Build the secret references
 */}}
-{{- define "chart.ldapUserSecretName" }}
-{{- if .Values.ldapAdmin.existingSecret.name }}
-{{- .Values.ldapAdmin.existingSecret.name }}
-{{- else -}}
-{{- printf "%s-user" (include "chart.fullname" . ) -}}
+{{- define "lldap.ldapConfigSecretName" }}
+{{- printf "%s-config" (include "lldap.fullname" . ) }}
+{{- end }}
+
+{{- define "lldap.ldapUserSecretName" }}
+{{- if .Values.lldap.ldapUser.existingSecret.name }}
+{{- .Values.lldap.ldapUser.existingSecret.name }}
+{{- else if .Values.lldap.ldapUser.secretName -}}
+{{- .Values.lldap.ldapUser.secretName }}
+{{- else }}
+{{- printf "%s-user" (include "lldap.fullname" . ) -}}
 {{- end }}
 {{- end }}
 
-{{- define "chart.ldapUserSecretkey.username" }}
-{{- if .Values.ldapAdmin.existingSecret.name }}
-{{- required ".Values.ldapAdmin.existingSecret.key.username is required" .Values.ldapAdmin.existingSecret.key.username}}
-{{- else -}}
-username
+{{- define "lldap.smtpUserSecretName" }}
+{{- if .Values.lldap.smtp.user.existingSecret.name }}
+{{- .Values.lldap.smtp.user.existingSecret.name }}
+{{- else if .Values.lldap.smtp.user.secretName -}}
+{{- .Values.lldap.smtp.user.secretName }}
+{{- else }}
+{{- printf "%s-user" (include "lldap.fullname" . ) -}}
 {{- end }}
 {{- end }}
 
-{{- define "chart.ldapUserSecretkey.email" }}
-{{- if .Values.ldapAdmin.existingSecret.name }}
-{{- required ".Values.ldapAdmin.existingSecret.key.email is required" .Values.ldapAdmin.existingSecret.key.email}}
-{{- else -}}
-email
-{{- end }}
+{{- define "lldap.smtpFromString" }}
+{{- .Values.lldap.smtp.from.name -}}
+{{- printf " <%s>" .Values.lldap.smtp.from.email -}}
 {{- end }}
 
-{{- define "chart.ldapUserSecretkey.password" }}
-{{- if .Values.ldapAdmin.existingSecret.name }}
-{{- required ".Values.ldapAdmin.existingSecret.key.password is required" .Values.ldapAdmin.existingSecret.key.password}}
-{{- else -}}
-password
-{{- end }}
+{{- define "lldap.smtpReplyToString" }}
+{{- .Values.lldap.smtp.replyTo.name -}}
+{{- printf " <%s>" .Values.lldap.smtp.replyTo.email -}}
 {{- end }}

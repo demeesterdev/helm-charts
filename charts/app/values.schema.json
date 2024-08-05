@@ -31,10 +31,7 @@
         }
       },
       "title": "deploymentStrategy",
-      "type": "object",
-      "required": [
-        "type"
-      ]
+      "type": "object"
     },
     "env": {
       "items": {},
@@ -88,12 +85,7 @@
       },
       "description": "hostname: staticname",
       "title": "image",
-      "type": "object",
-      "required": [
-        "repository",
-        "pullPolicy",
-        "tag"
-      ]
+      "type": "object"
     },
     "imagePullSecrets": {
       "items": {},
@@ -146,12 +138,7 @@
                               "type": "integer"
                             }
                           },
-                          "type": "object",
-                          "required": [
-                            "port",
-                            "path",
-                            "pathType"
-                          ]
+                          "type": "object"
                         }
                       ]
                     },
@@ -159,11 +146,7 @@
                     "type": "array"
                   }
                 },
-                "type": "object",
-                "required": [
-                  "host",
-                  "paths"
-                ]
+                "type": "object"
               }
             ]
           },
@@ -194,11 +177,7 @@
                     "type": "string"
                   }
                 },
-                "type": "object",
-                "required": [
-                  "secretName",
-                  "hosts"
-                ]
+                "type": "object"
               }
             ]
           },
@@ -207,13 +186,7 @@
         }
       },
       "title": "ingress",
-      "type": "object",
-      "required": [
-        "enabled",
-        "annotations",
-        "hosts",
-        "tls"
-      ]
+      "type": "object"
     },
     "initContainers": {
       "items": {},
@@ -295,11 +268,7 @@
                     "type": "integer"
                   }
                 },
-                "type": "object",
-                "required": [
-                  "name",
-                  "port"
-                ]
+                "type": "object"
               }
             ]
           },
@@ -313,11 +282,7 @@
         }
       },
       "title": "service",
-      "type": "object",
-      "required": [
-        "type",
-        "ports"
-      ]
+      "type": "object"
     },
     "serviceAccountName": {
       "default": "",
@@ -331,35 +296,5 @@
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "required": [
-    "replicaCount",
-    "image",
-    "command",
-    "args",
-    "imagePullSecrets",
-    "nameOverride",
-    "fullnameOverride",
-    "serviceAccountName",
-    "secrets",
-    "configs",
-    "envFrom",
-    "env",
-    "podAnnotations",
-    "podSecurityContext",
-    "securityContext",
-    "deploymentStrategy",
-    "service",
-    "persistentVolumes",
-    "extraVolumes",
-    "ingress",
-    "probes",
-    "resources",
-    "nodeSelector",
-    "tolerations",
-    "affinity",
-    "lifecycle",
-    "initContainers",
-    "extraContainers"
-  ]
+  "type": "object"
 }
