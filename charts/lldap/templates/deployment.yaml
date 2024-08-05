@@ -49,10 +49,6 @@ spec:
               value: http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}{{- with (first .paths) }}{{ .path }}{{- end }}
             {{- end }}
             {{- end }}
-            - name: LLDAP_LDAP_PORT
-              value: "{{ .Values.service.ldap.port }}"
-            - name: LLDAP_HTTP_PORT
-              value: "{{ .Values.service.http.port }}"
             - name: LLDAP_LDAP_USER_DN
               valueFrom:
                 secretKeyRef:
@@ -120,14 +116,14 @@ spec:
             {{- end }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.http.port }}
+              containerPort: 17170
               protocol: TCP
             - name: ldap
-              containerPort: {{ .Values.service.ldap.port }}
+              containerPort: 3890
               protocol: TCP
             {{ if $.Values.lldap.ldaps.enabled }}
             - name: ldaps
-              containerPort: {{ .Values.service.ldaps.port }}
+              containerPort: 6360
               protocol: TCP
             {{ end }}
           livenessProbe:

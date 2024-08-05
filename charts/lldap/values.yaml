@@ -212,13 +212,13 @@ securityContext:
 service:
   http:
     type: ClusterIP
-    port: 17170
+    port: 80
   ldap:
     type: ClusterIP
-    port: 3890
+    port: 389
   ldaps:
     type: ClusterIP
-    port: 6360
+    port: 636
 
 # -- Enable and configure ingress settings for the chart under this key.
 # @default -- See values.yaml
